@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   
   
-  <title>STERBEN&#39;S BLOG</title>
+  <title>一切从编译开始 | STERBEN&#39;S BLOG</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
     <meta name="description" content="励志学好Go语言！">
@@ -88,16 +88,15 @@
 </header>
 
       <div class="outer">
-        <section id="main">
-  <article id="post-一切从编译开始" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-一切从编译开始" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-inner">
     
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/02/25/%E4%B8%80%E5%88%87%E4%BB%8E%E7%BC%96%E8%AF%91%E5%BC%80%E5%A7%8B/">一切从编译开始</a>
+    <h1 class="p-name article-title" itemprop="headline name">
+      一切从编译开始
     </h1>
   
 
@@ -112,8 +111,22 @@
 </span>
       
       
+        <span class="article-views">
+  <i class="fa fa-views"></i>
+  <i id="busuanzi_container_page_pv">
+      <i id="busuanzi_value_page_pv"></i>
+  </i>
+</span>
+
+      
       
 <a href="/2023/02/25/%E4%B8%80%E5%88%87%E4%BB%8E%E7%BC%96%E8%AF%91%E5%BC%80%E5%A7%8B/#comments" class="article-comment-link">
+  
+    
+    
+    
+    
+    
   
   <i class="fa fa-commt"></i>
   留言
@@ -164,9 +177,21 @@
 <p>内容参考：<a href="https://link.juejin.cn/?target=https://draveness.me/golang/docs/part1-prerequisite/ch02-compile/golang-compile-intro/">左书祺《Go语言设计与编译》——「编译原理」</a></p>
 
         
+            <div id="toc-article">
+                
+  <div class="widget-wrap" id="toc-wrap">
+    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
+    <div class="widget">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-1-%E5%89%8D%E8%A8%80"><span class="toc-text">1.1 前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-2-%E5%9F%BA%E6%9C%AC%E6%9C%AF%E8%AF%AD%E4%BB%8B%E7%BB%8D"><span class="toc-text">1.2 基本术语介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-1-%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91"><span class="toc-text">1.2.1 抽象语法树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-2-%E9%9D%99%E6%80%81%E5%8D%95%E8%B5%8B%E5%80%BC"><span class="toc-text">1.2.2 静态单赋值</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-3-%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86"><span class="toc-text">1.3 编译原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-1-%E7%BC%96%E8%AF%91%E5%99%A8"><span class="toc-text">1.3.1 编译器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-2-%E6%A0%B8%E5%BF%83%E8%BF%87%E7%A8%8B"><span class="toc-text">1.3.2 核心过程</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-1-%E5%89%8D%E8%A8%80"><span class="toc-text">2.1 前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-2-%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90"><span class="toc-text">2.2 词法分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E5%85%B3%E4%BA%8E-Token"><span class="toc-text">2.2.1 关于 Token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-Go-%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.2.2 Go 词法分析的实现</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </div>
+
+
+            </div>
+        
         
           <blockquote id="copyright">
-              <p>原文链接: <a href="http://steadon.github.io/index.html">http://steadon.github.io/index.html</a></p>
+              <p>原文链接: <a href="http://steadon.github.io/2023/02/25/一切从编译开始/">http://steadon.github.io/2023/02/25/一切从编译开始/</a></p>
               <p>版权声明: 转载请注明出处.</p>
           </blockquote>
         
@@ -190,82 +215,36 @@
         </div>
       
       
+        
+<nav id="article-nav">
+  
+    <a href="/2023/02/20/%E5%BA%8F%C2%B7%E5%85%B6%E4%B8%80/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">older</strong>
+      <div class="article-nav-title">
+        
+          序·其一
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+      
+      
+        
+
+
+
+
+
+
+
+
       
     </footer>
   </div>
 </article>
-
-
-  <article id="post-序·其一" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/02/20/%E5%BA%8F%C2%B7%E5%85%B6%E4%B8%80/">序·其一</a>
-    </h1>
-  
-
-
-      </header>
-    
-    <div class="article-meta">
-      
-      <span class="article-date">
-  <i class="fa fa-date"></i>
-  <time class="dt-published" datetime="2023-02-19T20:12:29.000Z" itemprop="datePublished">2023年02月20日</time>
-</span>
-      
-      
-      
-<a href="/2023/02/20/%E5%BA%8F%C2%B7%E5%85%B6%E4%B8%80/#comments" class="article-comment-link">
-  
-  <i class="fa fa-commt"></i>
-  留言
-</a>
-
-
-    </div>
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>本人自大学以来投身于计算机的梦想与事业。大一时期大量练习了 C&#x2F;C++ 的各类编程题，后得前辈相助得以涉足 Java 领域，至大二寒假后，已基本掌握 JavaSE、MySQL、Redis、Spring、SpringMVC、Mybatis、Git、Linux、Docker、HTML、CSS、JavaScript、Axios 等技术，并能使用 SpringBoot 整合SSM框架完成 web 后端服务的开发及上线部署，也能简单运用 element-ui 实现前端页面设计并与后端接口对接。其间曾参与多个项目，包括但不限于 “ICH-App”（华北五省计算机应用大赛-数字博物馆及数字藏品交易app）、”GP-IMS”（天津市新工科一等奖-绿色园区碳排能耗管理系统）、”TUT-IMS”（某市武装部要讯计分系统）、”MMT-B&#x2F;C”（协同开发-TUT社团报名及面试系统B&#x2F;C端）基于个人对计算机行情的认知故而决定主攻分布式与微服务架构，机缘巧合参与”第五届字节跳动青训营”并接触了 Go 语言，于是深感其活力与魅力，故而决定转攻 Go 语言及 Docker 实践并深入至分布式及微服务架构。青训营期间以队长身份带领小队完成Go语言项目 “Tiktok”（协同开发-极简版抖音app后端），期间使用相关框架如 gorm、hertz 等，进一步感受到 Go 语言的便捷与高效，因此决定记录本人学习 Go 语言的路线与要点，一来提高本人学习动力，二来愿能帮助后来有缘人。</p>
-
-        
-        
-          <blockquote id="copyright">
-              <p>原文链接: <a href="http://steadon.github.io/index.html">http://steadon.github.io/index.html</a></p>
-              <p>版权声明: 转载请注明出处.</p>
-          </blockquote>
-        
-      
-    </div>
-    <footer class="article-footer">
-      
-        <div class="article-tag-wrap">
-          
-
-          
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GO%E8%AF%AD%E8%A8%80/" rel="tag">GO语言</a></li></ul>
-
-          
-    <div class="social-share">
-      <span>分享到:</span>
-    </div>
-
-
-
-        </div>
-      
-      
-      
-    </footer>
-  </div>
-</article>
-
-
-
 </section>
         
           <aside id="sidebar">
@@ -405,11 +384,36 @@
 
 
 
+  
+    
+<script src="/localshare/js/social-share.js"></script>
 
+    
+<script src="/localshare/js/qrcode.js"></script>
+
+  
+  
 
 
 
   
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+
 
 
 
