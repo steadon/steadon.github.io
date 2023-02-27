@@ -150,7 +150,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x_1 := <span class="number">1</span></span><br><span class="line">x_2 := <span class="number">2</span></span><br><span class="line">y_1 := x_2</span><br></pre></td></tr></table></figure>
 
 <p>由此可见前一段代码中<code>x := 1</code>其实是没有意义的，经过 SSA 优化后会自动舍去从而减少需要执行的指令量。</p>
-<h1 id="1-3-编译原理"><a href="#1-3-编译原理" class="headerlink" title="1.3 编译原理"></a>1.3 编译原理</h1><h3 id="1-3-1-编译器"><a href="#1-3-1-编译器" class="headerlink" title="1.3.1 编译器"></a>1.3.1 编译器</h3><p>Go 语言编译器的源代码在<code>src/cmd/compile</code>目录中，目录下的文件共同组成了 Go 语言的编译器。</p>
+<h1 id="1-3-编译原理"><a href="#1-3-编译原理" class="headerlink" title="1.3 编译原理"></a>1.3 编译原理</h1><h3 id="1-3-1-编译器"><a href="#1-3-1-编译器" class="headerlink" title="1.3.1 编译器"></a>1.3.1 编译器</h3><p>Go 语言编译器的源代码在 <code>src/cmd/compile</code> 目录中，目录下的文件共同组成了 Go 语言的编译器。</p>
 <p><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dcc2f277978243029f7c0058237b81f6~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp" alt="image.png"></p>
 <p>编译器一般分为前端和后端，前端一般负责着词法分析、语法分析、类型检查、和中间代码生成，后端一般负责目标代码的生成和优化，即优化中间代码后译为二进制机器码。</p>
 <h3 id="1-3-2-核心过程"><a href="#1-3-2-核心过程" class="headerlink" title="1.3.2 核心过程"></a>1.3.2 核心过程</h3><p>Go 语言的编译器可按逻辑分为四个阶段，分别如下图所示。</p>
@@ -160,21 +160,42 @@
 <p>2023 . 02 . 25</p>
 </blockquote>
 <p>上文我们已经铺叙了有关编译逻辑层面的四个阶段，下文我们继续探讨关于 Go 语言的词法分析和语法分析。</p>
-<h1 id="2-2-词法分析"><a href="#2-2-词法分析" class="headerlink" title="2.2 词法分析"></a>2.2 词法分析</h1><h3 id="2-2-1-关于-Token"><a href="#2-2-1-关于-Token" class="headerlink" title="2.2.1 关于 Token"></a>2.2.1 关于 Token</h3><p><code>Token</code>中文翻译为标记，是一个字符串，也是构成源代码的最小单位，从输入字符流中生成标记的过程叫作标记化（<code>tokenization</code>），在这个过程中，词法分析器还会对标记进行分类。编译器会从左到右扫描我们的源代码，将其中的字符流分割成一个一个的<code>Token</code>。</p>
-<h3 id="2-2-2-Go-词法分析的实现"><a href="#2-2-2-Go-词法分析的实现" class="headerlink" title="2.2.2 Go 词法分析的实现"></a>2.2.2 Go 词法分析的实现</h3><p>Go 语言的词法分析是通过<code>cmd/compile/internal/syntax.scanner</code>结构体实现的，这个结构体会持有当前扫描的数据源文件、启用的模式和当前被扫描到的<code>Token</code>。</p>
+<h1 id="2-2-词法分析"><a href="#2-2-词法分析" class="headerlink" title="2.2 词法分析"></a>2.2 词法分析</h1><h3 id="2-2-1-关于-Token"><a href="#2-2-1-关于-Token" class="headerlink" title="2.2.1 关于 Token"></a>2.2.1 关于 Token</h3><p><code>Token</code>中文翻译为标记，是一个字符串，也是构成源代码的最小单位，从输入字符流中生成标记的过程叫作标记化（ <code>tokenization</code> ），在这个过程中，词法分析器还会对标记进行分类。编译器会从左到右扫描我们的源代码，将其中的字符流分割成一个一个的<code>Token</code>。</p>
+<h3 id="2-2-2-Go-词法分析的实现"><a href="#2-2-2-Go-词法分析的实现" class="headerlink" title="2.2.2 Go 词法分析的实现"></a>2.2.2 Go 词法分析的实现</h3><p>Go 语言的词法分析是通过 <code>cmd/compile/internal/syntax.scanner</code> 结构体实现的，这个结构体会持有当前扫描的数据源文件、启用的模式和当前被扫描到的<code>Token</code>。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> scanner <span class="keyword">struct</span> &#123;</span><br><span class="line">	source</span><br><span class="line">	mode   <span class="type">uint</span></span><br><span class="line">	nlsemi <span class="type">bool</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// current token, valid after calling next()</span></span><br><span class="line">	line, col <span class="type">uint</span></span><br><span class="line">	blank     <span class="type">bool</span> <span class="comment">// line is blank up to col</span></span><br><span class="line">	tok       token</span><br><span class="line">	lit       <span class="type">string</span>   <span class="comment">// valid if tok is _Name, _Literal, or _Semi (&quot;semicolon&quot;, &quot;newline&quot;, or &quot;EOF&quot;); may be malformed if bad is true</span></span><br><span class="line">	bad       <span class="type">bool</span>     <span class="comment">// valid if tok is _Literal, true if a syntax error occurred, lit may be malformed</span></span><br><span class="line">	kind      LitKind  <span class="comment">// valid if tok is _Literal</span></span><br><span class="line">	op        Operator <span class="comment">// valid if tok is _Operator, _AssignOp, or _IncOp</span></span><br><span class="line">	prec      <span class="type">int</span>      <span class="comment">// valid if tok is _Operator, _AssignOp, or _IncOp</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>Go 语言中支持的全部<code>Token</code>类型都在<code>src/cmd/compile/internal/syntax/tokens.go</code>文件中定义了，所有的<code>Token</code>类型都是正整数，常见<code>Token</code>定义如：操作符、括号和关键字等。</p>
+<p>Go 语言中支持的全部 <code>Token</code> 类型都在 <code>src/cmd/compile/internal/syntax/tokens.go</code> 文件中定义了，所有的 <code>Token</code> 类型都是正整数，常见 <code>Token</code> 定义如：操作符、括号和关键字等。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	_    token = <span class="literal">iota</span></span><br><span class="line">	_EOF       <span class="comment">// EOF</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// operators and operations</span></span><br><span class="line">	_Operator <span class="comment">// op</span></span><br><span class="line">	...</span><br><span class="line"></span><br><span class="line">	<span class="comment">// delimiters</span></span><br><span class="line">	_Lparen    <span class="comment">// (</span></span><br><span class="line">	_Lbrack    <span class="comment">// [</span></span><br><span class="line">	...</span><br><span class="line"></span><br><span class="line">	<span class="comment">// keywords</span></span><br><span class="line">	_Break       <span class="comment">// break</span></span><br><span class="line">	...</span><br><span class="line">	_Type        <span class="comment">// type</span></span><br><span class="line">	_Var         <span class="comment">// var</span></span><br><span class="line"></span><br><span class="line">	tokenCount <span class="comment">//</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 
-<p>Go 语言中定义的Token将语言中的元素分为了四个类型，分别是名称和字面量、操作符、分隔符、和关键字，其词法分析主要由 <code>cmd/compile/internal/syntax.scanner</code>结构体中的<code>cmd/compile/internal/syntax.scanner.next</code>方法驱动，而驱动主体是一个<code>switch/case</code>结构，在<code>for</code>循环中不断获取最新字符，并通过<code>cmd/compile/internal/syntax.source.nextch</code>方法追加到 <code>cmd/compile/internal/syntax.scanner</code>持有的缓冲区中。</p>
+<p>Go 语言中定义的Token将语言中的元素分为了四个类型，分别是名称和字面量、操作符、分隔符、和关键字，其词法分析主要由 <code>cmd/compile/internal/syntax.scanner </code>结构体中的 <code>cmd/compile/internal/syntax.scanner.next</code> 方法驱动，而驱动主体是一个 <code>switch/case</code> 结构，在 <code>for</code> 循环中不断获取最新字符，并通过 <code>cmd/compile/internal/syntax.source.nextch</code> 方法追加到  <code>cmd/compile/internal/syntax.scanner</code> 持有的缓冲区中。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *scanner)</span></span> next() &#123;</span><br><span class="line">	...</span><br><span class="line">	s.stop()</span><br><span class="line">	startLine, startCol := s.pos()</span><br><span class="line">	<span class="keyword">for</span> s.ch == <span class="string">&#x27; &#x27;</span> || s.ch == <span class="string">&#x27;\t&#x27;</span> || s.ch == <span class="string">&#x27;\n&#x27;</span> &amp;&amp; !nlsemi || s.ch == <span class="string">&#x27;\r&#x27;</span> &#123;</span><br><span class="line">		s.nextch()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	s.line, s.col = s.pos()</span><br><span class="line">	s.blank = s.line &gt; startLine || startCol == colbase</span><br><span class="line">	s.start()</span><br><span class="line">	<span class="keyword">if</span> isLetter(s.ch) || s.ch &gt;= utf8.RuneSelf &amp;&amp; s.atIdentChar(<span class="literal">true</span>) &#123;</span><br><span class="line">		s.nextch()</span><br><span class="line">		s.ident()</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">switch</span> s.ch &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">-1</span>:</span><br><span class="line">            s.tok = _EOF</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> <span class="string">&#x27;0&#x27;</span>, <span class="string">&#x27;1&#x27;</span>, <span class="string">&#x27;2&#x27;</span>, <span class="string">&#x27;3&#x27;</span>, <span class="string">&#x27;4&#x27;</span>, <span class="string">&#x27;5&#x27;</span>, <span class="string">&#x27;6&#x27;</span>, <span class="string">&#x27;7&#x27;</span>, <span class="string">&#x27;8&#x27;</span>, <span class="string">&#x27;9&#x27;</span>:</span><br><span class="line">            s.number(<span class="literal">false</span>)  <span class="comment">//整数匹配</span></span><br><span class="line">            ...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>值得一提的是，早期 Go 语言其实也用过 lex 来生成词法解析器，但后来还是使用 Go 来实现了词法分析器，用自己写的词法分析器来解析自己。</p>
-<blockquote>
-<p>未完待续</p>
+<h1 id="3-1-前言"><a href="#3-1-前言" class="headerlink" title="3.1 前言"></a>3.1 前言</h1><blockquote>
+<p>2023 . 02 .26</p>
 </blockquote>
-<p>内容参考：<a href="https://link.juejin.cn/?target=https://draveness.me/golang/docs/part1-prerequisite/ch02-compile/golang-compile-intro/">左书祺《Go语言设计与编译》——「编译原理」</a></p>
+<p>上期我们通过对词法分析的探讨已经较为熟悉编译器的工作和责任，接下来再深入了解一下语法分析，之后的中间代码生成和机器码生成偏底层偏硬件就不再多讲了。</p>
+<h1 id="3-2-语法分析"><a href="#3-2-语法分析" class="headerlink" title="3.2 语法分析"></a>3.2 语法分析</h1><p>即根据某种特定的形式文法（不同编译器或有不同文法）对 Token 序列构成的输入文本进行分析并确定其语法结构的过程。我们将词法分析串联起来就是，词法分析的输出文本————Token 序列就是语法分析的输入文本。</p>
+<h3 id="3-2-1-文法"><a href="#3-2-1-文法" class="headerlink" title="3.2.1 文法"></a>3.2.1 文法</h3><p><a href="https://link.juejin.cn/?target=https://en.wikipedia.org/wiki/Context-free_grammar">上下文无关文法</a>是用来形式化、精确描述某种编程语言的工具。文法都由以下的四个部分组成。</p>
+<ul>
+<li>N 有限个非终结符的集合；</li>
+<li>Σ 有限个终结符的集合；</li>
+<li>P 有限个生产规则的集合；</li>
+<li>S 非终结符集合中唯一的开始符号；</li>
+</ul>
+<blockquote>
+<p>终结符是文法中无法再被展开的符号，而非终结符与之相反，还可以通过生产规则进行展开</p>
+</blockquote>
+<h3 id="3-2-2-分析方法"><a href="#3-2-2-分析方法" class="headerlink" title="3.2.2 分析方法"></a>3.2.2 分析方法</h3><p>语法分析的分析方法一般分为自顶向下和自底向上两种，这两种方式会使用不同的方式对输入的 Token 序列进行推导。</p>
+<ul>
+<li><a href="https://link.juejin.cn/?target=https://en.wikipedia.org/wiki/Top-down_parsing">自顶向下分析</a>：对于任意一个输入流，根据当前的输入符号，确定一个生产规则，使用生产规则右侧的符号替代相应的非终结符向下推导。</li>
+<li><a href="https://link.juejin.cn/?target=https://en.wikipedia.org/wiki/Bottom-up_parsing">自底向上分析</a>：每次都尝试重写最右侧的多个符号，这其实是说解析器会从最简单的符号进行推导，在解析的最后合并成开始符号。</li>
+<li><a href="https://link.juejin.cn/?target=https://en.wikipedia.org/wiki/Lookahead">向前查看（Lookahead）</a>：在不同生产规则发生冲突时，当前解析器需要通过预读一些 Token 判断当前应该用什么规则对输入流进行展开或者归约。</li>
+</ul>
+<h3 id="3-2-3-LALR-1-文法"><a href="#3-2-3-LALR-1-文法" class="headerlink" title="3.2.3 LALR(1)文法"></a>3.2.3 LALR(1)文法</h3><p>LALR(1)是Go 语言的解析器使用的文法，最右推导加向前查看构成了 Go 语言解析器的最基本原理，在这一点上大多数语言做出了同样的选择。</p>
+<p>编译器的主函数会调用多个 Goroutine 来解析源文件，解析过程初始化了 <code>parser</code> 结构体并调用 <code>fileOrNil</code> 方法开启了对当前文件的词法和语法分析。 而 <code>fileOrNil</code> 方法会先解析文件开头的 <code>package</code> 定义，并匹配对应的包名保存到返回的文件结构体中，之后编译器会获取关键词进入 switch 的不同分支并通过 <code>appendGroup</code> 方法传入该包中相关函数。 而 <code>fileOrNil </code>方法与其子方法共同构成了一棵树，树的根节点与 Go 语言的文法中的生产规则一一对应。</p>
+<p><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6dcfb9f9a7894231b90e550e740cb55e~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp" alt="image.png"></p>
+<p>内容参考：<a target="_blank" rel="noopener" href="https://draveness.me/golang/">左书祺《Go语言设计与编译》——「编译原理」</a></p>
 
         
             <div id="toc-article">
@@ -182,7 +203,7 @@
   <div class="widget-wrap" id="toc-wrap">
     <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
     <div class="widget">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-1-%E5%89%8D%E8%A8%80"><span class="toc-text">1.1 前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-2-%E5%9F%BA%E6%9C%AC%E6%9C%AF%E8%AF%AD%E4%BB%8B%E7%BB%8D"><span class="toc-text">1.2 基本术语介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-1-%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91"><span class="toc-text">1.2.1 抽象语法树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-2-%E9%9D%99%E6%80%81%E5%8D%95%E8%B5%8B%E5%80%BC"><span class="toc-text">1.2.2 静态单赋值</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-3-%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86"><span class="toc-text">1.3 编译原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-1-%E7%BC%96%E8%AF%91%E5%99%A8"><span class="toc-text">1.3.1 编译器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-2-%E6%A0%B8%E5%BF%83%E8%BF%87%E7%A8%8B"><span class="toc-text">1.3.2 核心过程</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-1-%E5%89%8D%E8%A8%80"><span class="toc-text">2.1 前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-2-%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90"><span class="toc-text">2.2 词法分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E5%85%B3%E4%BA%8E-Token"><span class="toc-text">2.2.1 关于 Token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-Go-%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.2.2 Go 词法分析的实现</span></a></li></ol></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-1-%E5%89%8D%E8%A8%80"><span class="toc-text">1.1 前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-2-%E5%9F%BA%E6%9C%AC%E6%9C%AF%E8%AF%AD%E4%BB%8B%E7%BB%8D"><span class="toc-text">1.2 基本术语介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-1-%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91"><span class="toc-text">1.2.1 抽象语法树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-2-%E9%9D%99%E6%80%81%E5%8D%95%E8%B5%8B%E5%80%BC"><span class="toc-text">1.2.2 静态单赋值</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-3-%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86"><span class="toc-text">1.3 编译原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-1-%E7%BC%96%E8%AF%91%E5%99%A8"><span class="toc-text">1.3.1 编译器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-2-%E6%A0%B8%E5%BF%83%E8%BF%87%E7%A8%8B"><span class="toc-text">1.3.2 核心过程</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-1-%E5%89%8D%E8%A8%80"><span class="toc-text">2.1 前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-2-%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90"><span class="toc-text">2.2 词法分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E5%85%B3%E4%BA%8E-Token"><span class="toc-text">2.2.1 关于 Token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-Go-%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.2.2 Go 词法分析的实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-1-%E5%89%8D%E8%A8%80"><span class="toc-text">3.1 前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-2-%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90"><span class="toc-text">3.2 语法分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-%E6%96%87%E6%B3%95"><span class="toc-text">3.2.1 文法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-%E5%88%86%E6%9E%90%E6%96%B9%E6%B3%95"><span class="toc-text">3.2.2 分析方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-3-LALR-1-%E6%96%87%E6%B3%95"><span class="toc-text">3.2.3 LALR(1)文法</span></a></li></ol></li></ol></li></ol>
     </div>
   </div>
 
@@ -228,6 +249,15 @@
     </a>
   
   
+    <a href="/2023/02/27/%E6%8A%8A%E5%88%87%E7%89%87%E8%AF%B4%E5%BE%97%E6%98%8E%E6%98%8E%E7%99%BD%E7%99%BD/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">newer</strong>
+      <div class="article-nav-title">
+        
+          把切片说得明明白白
+        
+      </div>
+    </a>
+  
 </nav>
 
       
@@ -256,6 +286,10 @@
       <ul>
         
           <li>
+            <a href="/2023/02/27/%E6%8A%8A%E5%88%87%E7%89%87%E8%AF%B4%E5%BE%97%E6%98%8E%E6%98%8E%E7%99%BD%E7%99%BD/">把切片说得明明白白</a>
+          </li>
+        
+          <li>
             <a href="/2023/02/25/%E4%B8%80%E5%88%87%E4%BB%8E%E7%BC%96%E8%AF%91%E5%BC%80%E5%A7%8B/">一切从编译开始</a>
           </li>
         
@@ -273,7 +307,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title"><i class="fa fa-tag"></i> 标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/GO-%E8%AF%AD%E8%A8%80/" style="font-size: 10px;">GO 语言</a>
+      <a href="/tags/GO-%E8%AF%AD%E8%A8%80/" style="font-size: 20px;">GO 语言</a> <a href="/tags/Go%E8%AF%AD%E8%A8%80/" style="font-size: 10px;">Go语言</a>
     </div>
   </div>
 
@@ -285,7 +319,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title"><i class="fa fa-archive"></i> 归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023年</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023年</a><span class="archive-list-count">3</span></li></ul>
     </div>
   </div>
 
@@ -295,7 +329,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title"><i class="fa fa-tag"></i> 标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/GO-%E8%AF%AD%E8%A8%80/" rel="tag">GO 语言</a><span class="tag-list-count">2</span></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/GO-%E8%AF%AD%E8%A8%80/" rel="tag">GO 语言</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E8%AF%AD%E8%A8%80/" rel="tag">Go语言</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
