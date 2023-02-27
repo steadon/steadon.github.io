@@ -175,7 +175,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">v27 (+<span class="number">5</span>) = SliceMake &lt;[]<span class="type">int</span>&gt; v11 v14 v17</span><br><span class="line"></span><br><span class="line">name &amp;arr[*[<span class="number">3</span>]<span class="type">int</span>]: v11</span><br><span class="line">name slice.ptr[*<span class="type">int</span>]: v11</span><br><span class="line">name slice.<span class="built_in">len</span>[<span class="type">int</span>]: v14</span><br><span class="line">name slice.<span class="built_in">cap</span>[<span class="type">int</span>]: v17</span><br></pre></td></tr></table></figure>
 
 <p>其实 <code>SliceMake</code> 操作就是接收了四个参数创建新切片而已，分别是元素类型、数组指针、切片大小和容量。需要注意的是，使用下标初始化切片并不会拷贝原数组或原切片，只是创建了一个指向原数组或者原切片结构体的指针，所以修改新切片的同时原切片也会被修改。</p>
-<p>文章参考：<a href="https://link.juejin.cn/?target=https://draveness.me/golang/docs/part1-prerequisite/ch02-compile/golang-compile-intro/">左书祺《Go语言设计与编译》——「编译原理」</a></p>
+<p>内容参考：<a target="_blank" rel="noopener" href="https://draveness.me/golang/">左书祺《Go语言设计与编译》——「编译原理」</a></p>
 
         
         
